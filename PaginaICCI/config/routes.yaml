@@ -1,0 +1,12 @@
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+    
+lucky_number:
+    path: /lucky
+    controller: App\Controller\LuckyController::number
+
+unap_test:
+    path: /ICCIUnapController
+    controller: App\Controller\ICCIUnapController
+
