@@ -1,0 +1,239 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{post ? post.title : "No encontrado."}} {% endblock %}
+{% block body %}
+
+    {% if post is null %}
+        <div class="d-flex align-items-center justify-content-center">
+            <div class="text-center mw-10">
+                <h6 class="display-6 fw-bold">Oops! Post no encontrado, probablemente lo hackearon...</h6>
+                <img class="img-fluid rounded mx-auto d-block" src="https://media.tenor.com/PDsMipaVbcsAAAAd/among-us-sus-dance.gif" width="400" height="300">
+                <p class="lead">El post que estás buscando no existe en esta página, para seguir explorando podrías ir a la página principal.</p>
+                <a href="{{path('icci_inicio')}}" class="btn btn-primary">Pagina principal</a>
+            </div>
+        </div>
+    {% else %}
+        <script defer>
+        </script>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Post content-->
+                    <article>
+                        <!-- Post header-->
+                        <header class="mb-4">
+                            <!-- Post title-->
+                            <h1 class="fw-bolder mb-1">{{post.title}}</h1>
+                            <!-- Post meta content-->
+                            <div class="text-muted fst-italic mb-2">Publicado el {{post.date | date('d/m/Y')}} por {{post.user}}</div>
+                            <!-- Post categories-->
+                            <a class="badge bg-secondary text-decoration-none link-light" href="{{path('icci_inicio')}}">{{post.category | capitalize}}</a>
+                        </header>
+                        <!-- Preview image figure-->
+                        <figure class="mb-4"><img class="img-fluid rounded" src="{{post.repImage ? post.repImage : "https://dummyimage.com/900x400/000/fff&text=No+hay+imagen+:("}}" alt="..."></figure>
+                        <!-- Post content-->
+                        <section class="mb-5">
+                            <p class="fs-5 mb-4">{{post.content| nl2br}}</p>
+
+                            <!-- Slideshow -->
+                            {% set content_images = post.contentImages %}
+                            {% if content_images %}
+                                <div class="carousel slide" id="car_unap_imgs" data-bs-ride="true">
+
+                                    <div class="carousel-inner">
+                                    {% for image in post.contentImages %}
+                                        {% set idx = loop.index %}
+                                        {% if idx == 1 %}
+                                                <div class="carousel-item active">
+                                        {% else %}
+                                                <div class="carousel-item">
+                                        {% endif %}
+                                            <img src={{image}} class="d-block w-100">
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+    
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#car_unap_imgs" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Anterior</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#car_unap_imgs" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Siguiente</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </section>
+                    </article>
+                    <!-- Comments section-->
+                    <section class="mb-5">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <!-- Comment form-->
+
+                                {% if app.user %}
+                                    {{ render(controller('App\\Controller\\PostsController::commentForm', {'id': post.id})) }}
+                                {% endif %}
+  
+                                <!-- <form class="mb-5">
+                                    <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
+                                    <button class="btn btn-primary mt-3 float-end">Prueba</button>
+                                </form> -->
+                                <!-- Comment with nested comments-->
+                                <!-- <div class="d-flex mb-4">
+                                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                                    <div class="ms-3">
+                                        <div class="fw-bold">Commenter Name</div>
+                                        If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
+                                        <div class="d-flex mt-4">
+                                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                                            <div class="ms-3">
+                                                <div class="fw-bold">Commenter Name</div>
+                                                And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
+                                            </div>
+                                        </div>
+                                        <div class="d-flex mt-4">
+                                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                                            <div class="ms-3">
+                                                <div class="fw-bold">Commenter Name</div>
+                                                When you put money directly to a problem, it makes a good headline.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                {% set comments = post_comments %}
+                                {% for comment in comments|reverse %}
+                                    <div class="d-flex mt-4 mb-1">
+                                        <!-- TODO: Arreglar la imagen de perfil / comprimir -->
+                                        <div class="flex-shrink-0"><img class="rounded-circle img-fluid d-block" style="width:50px; height: 50px" src="{{comment.author.pfpUrl}}" alt="..."></div>
+                                            <div class="ms-3">
+                                                <div class="row">
+                                                <div class="fw-bold">{{comment.author}} {{comment.author == post.user ? "(Autor)" : ""}}</div>
+                                                    <div class="col fs-6 text-muted">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{comment.modifiedat ? "#009000" : "currentColor"}}" class="bi bi-clock" viewBox="0 0 16 16">
+                                                            <title>Creado el {{comment.createdat | date('d-m-y H:i:s')}}{% if comment.modifiedat is not null %}&#xA;Modificado el {{comment.modifiedat | date('d-m-y H:i:s')}}{% endif %}</title>
+                                                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                                        </svg>
+                                                        {% if app.user and comment.author.id == app.user.id %}
+                                                            <a href="#a"data-bs-toggle="modal" data-bs-target="#comment_update_{{comment.id}}" class="link-primary text-decoration-none">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                                    <title>Editar comentario.</title>
+                                                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                                                </svg>
+                                                            </a>
+                                                            <div class="modal fade" id="comment_update_{{comment.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Actualizar comentario</h1>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        {{render(controller('App\\Controller\\CommentController::editCommentForm', {'id': comment.id, 'content': comment.content})) }}
+                                                                        <!--<form>
+                                                                        <div class="mb-3">
+                                                                            <label for="recipient-name" class="col-form-label">Recipient:</label>
+                                                                            <input type="text" class="form-control" id="recipient-name">
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label for="message-text" class="col-form-label">Message:</label>
+                                                                            <textarea class="form-control" id="message-text"></textarea>
+                                                                        </div>
+                                                                        </form> -->
+                                                                    </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <a class="link-danger text-decoration-none" id="borrar_comentario_{{comment.id}}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                                                    <title>Borrar comentario.</title>
+                                                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                                                </svg>
+                                                                {{ render(controller('App\\Controller\\CommentController::deleteForm', {'id': comment.id})) }}
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+
+                                                    <div id="content_comment" style="word-wrap: anywhere;">
+                                                        {{comment.content | nl2br}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Side widgets-->
+                <div class="col-lg-4">
+                    <!-- Search widget-->
+                    <!-- <div class="card mb-4">
+                        <div class="card-header">Search</div>
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search">
+                                <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- Categories widget-->
+                    <div class="card mb-4">
+                        <div class="card-header">Categorias (BETA)</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <ul class="list-unstyled mb-0">
+                                        <li><a href="{{path(post.category)}}">{{post.category | capitalize}}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Side widget-->
+                    {% if app.user and app.user.id == post.user.id %}
+                        <div class="card mb-4">
+                            <div class="card-header">Acciones</div>
+                            <div class="card-body">
+                                <a href="{{path('editar_post', {id: post.id})}}" class="btn btn-primary" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                    </svg>
+                                    Editar
+                                </a>
+                                <button href="" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                    </svg>
+                                    Borrar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirmación</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Estás seguro de borrar el post? Una vez borrado no hay vuelta atrás.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Volver</button>
+                                    {{form_start(del_form)}}
+                                        {{form_widget(del_form.borrar)}}
+                                        <input type="hidden" name="token" value={{csrf_token('delete-token')}}/>
+                                    {{form_end(del_form)}}
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

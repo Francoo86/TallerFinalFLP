@@ -1,0 +1,38 @@
+{% extends 'baseform.html.twig' %}
+
+{% block body %}
+
+<form method="post">
+    
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">Logearse</h1>
+    <div class="form-floating">
+        <input type="text" value="{{ last_username}}" name="email" id="floatingInput" class="form-control" autocomplete="email" required autofocus>
+        <label for="floatingInput">Correo electronico (UNAP)</label>
+    </div>
+    <div class="form-floating">
+        <input type="password" name="password" id="floatingPassword" class="form-control" autocomplete="current-password" required>
+        <label for="floatingPassword">Contraseña</label>
+    </div>
+
+
+    <button class="w-100 btn btn-lg btn-primary" type="submit">
+        Logearse
+    </button>
+
+    <input type="hidden" name="_csrf_token"
+        value="{{ csrf_token('authenticate') }}"
+    >
+
+</form>
+
+{% endblock %}
