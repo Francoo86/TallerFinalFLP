@@ -1,0 +1,9 @@
+
+    {{ form_start(update_comment_form, {
+        method: 'POST', 
+        action: path('editar_comentario', {'id': comment_id})})
+        }}
+
+        {{form_widget(update_comment_form.content, {'value': content})}}
+        {{form_widget(update_comment_form.submit, {'label':'Actualizar'})}}
+    {{ form_end(update_comment_form) }}

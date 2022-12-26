@@ -1,0 +1,56 @@
+{% extends 'baseform.html.twig' %}
+
+{% block title %}Registro{% endblock %}
+{% set email_errors = registrationForm.email.vars.errors %}
+{% set captcha_errors = registrationForm.captchaRegister.vars.errors %}
+
+{% block body %}
+    <h1>Registro</h1>
+    <p>Por favor, introduzca el correo electronico de la UNAP (estudiantesunap.cl).</p>
+    <p>No se aceptarán otros tipos de correo.</p>
+    {{form_start(registrationForm)}}
+
+        {% if email_errors|length %}
+            {% for input_error in email_errors%}
+                <div class="alert alert-danger" role="alert">{{input_error.message}}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% if captcha_errors|length %}
+            {% for input_error in captcha_errors %}
+                <div class="alert alert-danger" role="alert">{{input_error.message}}</div>
+            {% endfor %}
+        {% endif %}
+
+
+        <div class="form-floating">
+            {{form_widget(registrationForm.email, {
+                'attr': {'class': 'form-control'},
+                })}}
+            <label for={{registrationForm.email.vars.id}}>Email</label>
+        </div>
+
+        <div class="form-floating">
+            {{form_widget(registrationForm.plainPassword, {
+                'attr': {'class' : 'form-control'}
+            })}}
+
+            <label for={{registrationForm.plainPassword.vars.id}}>Contraseña</label>
+        </div>
+
+        <!-- Evitar creacion de cuentas simultaneas -->
+        <div class="form-floating mb-3">
+            <p class="text-center">Rellenar Captcha:
+            {{form_widget(registrationForm.captchaRegister, {
+                'attr': {'class': 'form-control'}
+            })}}
+        </div>
+            <!-- <div class="form-check form-switch">
+                {#{ form_row(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}})}#}
+            </div> -->
+
+        <button type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
+        <script>
+        </script>
+    {{ form_end(registrationForm) }}
+{% endblock %}

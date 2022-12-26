@@ -3,8 +3,29 @@
 {% block title %}Inicio: ICCI UNAP{% endblock %}
 
 {% block body %}
-<style>
 
+<section class="py-5 text-center container" >
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Bienvenid@ a la página de ICCI.</h1>
+        <p class="lead text-muted">Esta pagina está creada con el fin de favorecer a la comunidad de estudiantes de la carrera de la UNAP. </p>
+        <p class="lead text-muted">"De estudiantes para estudiantes."</p>
+
+        {% if app.user %}
+          <p class="lead text-muted">Bienvenid@ {{app.user.username}} </p>
+        {% else %}
+          <p class="lead text-muted">Por favor, logeate.</p>
+            <p>
+              <a href="#" class="btn btn-primary my-2">Registrarse</a>
+              <a href="#" class="btn btn-secondary my-2">Logearse</a>
+          </p>
+        {% endif %}
+
+      </div>
+    </div>
+  </section>
+
+<style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>

@@ -1,0 +1,149 @@
+{% extends "./base.html.twig" %}
+
+{% set is_update = mode == 'update' %}
+{% set name_mode = is_update ? 'Actualizar' : 'Crear' %} 
+
+{% block title %} {{name_mode}} post {% endblock %}
+
+{% block body %}
+<div class="w-4/5 m-auto pt-40">
+    <h1 class="text-6xl pb-12">
+        {{name_mode}} post
+    </h1>
+
+    <div class="mb-3">
+    {{form_start(form)}}
+
+        <label for={{form.title.vars.id}} class="form-label">Titulo del Post</label>
+        {{form_widget(form.title)}}
+
+        <label for{{form.content.vars.id}} class="form-label">Contenido del Post</label>
+        {{form_widget(form.content)}}
+
+        {{form_widget(form.category)}}
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-5">
+                    <!-- Evitar conflictos con la otra subida de imagenes -->
+                    <div id="rep_image_upload">
+                        <hr>
+                        {% if data is defined and data is not null %}
+                            <p class="Imagen representativa del post"</p>
+                            {% if data.repImage %}
+                                <p class="text-break">Imagen representativa del post.</p>
+                                <img src="{{data.repImage}}" class="img-fluid">
+                            {% else %}
+                                <p class="text-break">Actualmente el post no cuenta con una imagen representativa.</p>
+                            {% endif %} 
+                        {% endif %}
+                        <p class="text-break">Seleccionar imagen representativa para el Post (opcional).</p>
+                        {{form_widget(form.repImage, {'attr': {'onchange': 'loadFile(event)'}})}}
+                        <img src="" id="rep_image" class="img-fluid">
+                    </div>
+                </div>
+
+                <div class="ml-3 col-sm-5">
+                    <!-- Evitar conflictos con la otra subida de imagenes -->
+                    <div id="rep_image_upload">
+                        <hr>
+                        <p class="text-break">Imagenes para el post (opcional).</p>
+                        {{form_widget(form.contentImages)}}
+                        <!-- Aca deberian ir las imagenes a subir como un slideshow. -->
+                        <!-- TIP HTML para mi: El atributo multiple funciona seleccionando todos los archivos solo 1 vez. -->
+                        <div class="carousel slide" id="before_upload_sw" data-bs-ride="carousel">
+                            <div class="carousel-inner" id="car_slide_img">
+                            <!-- No va nada porque se configura en JS -->
+                            </div>
+                              <button class="carousel-control-prev" type="button" data-bs-target="#before_upload_sw" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#before_upload_sw" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+        //Oh no, callback hell. (Vanilla JS).
+        let loadFile = function(event) {
+            showImages("rep_image", function(data){
+                data.onload = function() {
+                    URL.revokeObjectURL(data.src);
+
+                    const checkBtn = document.getElementById("tmp_img_button");
+
+                    //No crearlo de nuevo.
+                    if (checkBtn != null) return;
+                    const btn = document.createElement("button");
+                    const txt = document.createTextNode("Eliminar imagen");
+                    btn.className = "btn btn-primary mt-3";
+                    btn.type = "button";
+                    btn.id = "tmp_img_button";
+                    btn.appendChild(txt);
+
+                    const contDiv = document.getElementById("rep_image_upload");
+                    contDiv.appendChild(btn);
+
+                    btn.onclick = function(remEvt) {
+                        let imgForm = document.getElementById("post_forms_repImage");
+                        if (!imgForm) return;
+
+                        imgForm.value = null;
+
+                        //Hacer la imagen 'invisible'.
+                        data.removeAttribute("width");
+                        data.removeAttribute("height");
+                        data.src = "";
+        
+                        btn.remove();
+                    }
+                }
+            })
+        }
+    
+
+        $(function() {
+            // Multiple images preview in browser
+            let imagesPreview = function(input, placeToInsertImagePreview) {
+                if (!input.files) return;
+                let childCount = document.getElementById("car_slide_img").childElementCount;
+                let filesAmount = input.files.length;
+    
+                for (let i = 0; i < filesAmount; i++) {
+                    let reader = new FileReader();
+                    let finalVal = "'" + "carousel-item" + ((i > 0) ? "" : " active") + "'";
+
+                    $("<div id=num_img_" + i + " class=" + finalVal + "></div>").appendTo(placeToInsertImagePreview);
+                
+                    let carAppend = "div.carousel div.carousel-item#num_img_" + i;
+
+                    reader.onload = function(event) {
+                        $($.parseHTML('<img class="img-fluid d-block w-100">')).attr('src', event.target.result).appendTo(carAppend);
+                    }
+
+                    reader.readAsDataURL(input.files[i]);
+                }
+            };
+
+            $('#post_forms_contentImages').on('change', function() {
+                imagesPreview(this, 'div.carousel #car_slide_img');
+            });
+        });
+        
+        </script>
+
+        <button    
+            type="submit"
+            class="btn btn-primary ml-1">
+            {{name_mode}}
+        </button>
+
+    {{form_end(form)}}
+    </div>
+</div>
+{% endblock %}

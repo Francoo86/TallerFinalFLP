@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% set route = app.request.attributes.get("_route") %}
+{% set route = route == "usuario_posts" ? "posts de usuario" : route %}
+{% block title %} {{route|capitalize}} {% endblock %}
+
+{% block body %}
+        <section class="py-5 text-center container">
+        <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">Seccion de {{route}}</h1>
+            <p class="lead text-muted">
+                {% if route == "anuncios" %}
+                    Si tienes algún anuncio ya sea de una reunión, o dar a conocer información importante (acerca de la universidad o por ejemplo acerca de las prácticas) está es la sección.
+                {% elseif route == "servicios" %}
+                    Esta sección está para ofrecer ayuda/servicios a los estudiantes.
+                {% elseif route == "eventos" %}
+                    En esta sección se pondrán eventos ya sea como organizaciones para un determinado fin, juntas para realizar actividades recreativas, etc.
+                {% else %}
+                    Aquí podrás visualizar todos los posts creados por ti.
+                {% endif %}
+            </p>
+            <a href="{{path('crear_post')}}" type="button" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                 <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"></path>
+                </svg>
+                Añadir post
+              </a>
+        </div>
+        </div>
+    </section>
+    <div class="album py-5 bg-light">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for userpost in userposts %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <img class="card-img-top" width="100%" height="225" src="{{userpost.repImage ? userpost.repImage : "https://dummyimage.com/900x400/000/fff&text=No+hay+imagen+:("}}">
+
+                            <div class="card-body">
+                                <h4 class="card-text">{{userpost.title}}</h4>
+                                <p class="card-text">{{userpost.content|length > 50 ? userpost.content|slice(0, 50) ~ '...' : userpost.content}}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a href='post/{{userpost.id}}' type="button" class="btn btn-sm btn-primary">Ver</a>
+                                        {% if app.user and userpost.user.id == app.user.id %}
+                                            <a href="{{path('editar_post', {'id': userpost.id})}}" type="button" class="btn btn-sm btn-secondary">Editar</a>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">Por {{userpost.user}}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

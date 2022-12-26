@@ -1,0 +1,10 @@
+
+    {{ form_start(del_form_comment, {method: 'POST', action: path('borrar_comentario', {'id': id}), 'attr': {'id' : 'borrar_com_form_' ~ id}})}}
+
+    <!-- Tremendo script me cargue -->
+    <script defer>
+        let deleteHref = document.getElementById("borrar_comentario_{{id}}");
+        deleteHref.addEventListener("click", function () {document.getElementById("borrar_com_form_{{id}}").submit()});
+    </script>
+
+    {{ form_end(del_form_comment) }}
