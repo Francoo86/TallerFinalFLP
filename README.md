@@ -5,3 +5,7 @@ En este caso el lenguaje a utilizar es PHP más el framework de Symfony.
 ## Frameworks adicionales
 
 También se utilizó Bootstrap para los estilos de cascada.
+
+## Info
+
+Considerando mejorar este proyecto.
